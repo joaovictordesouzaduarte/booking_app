@@ -42,10 +42,10 @@ def creating_collection_and_schema_validator():
                     'bsonType': 'int',
                     'minimum': 0,
                     'maximum': 5,
-                    'description': 'must be a string and required'
+                    'description': 'must be a integer and required'
                 },
                 'room': {
-                    'bsonType': ['int'],
+                    'bsonType': ['string'],
                 },
                 'cheapestPrice': {
                     'bsonType': 'number'

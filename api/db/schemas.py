@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 
 class Hotels(BaseModel):
@@ -10,7 +10,7 @@ class Hotels(BaseModel):
     photos: List[str]
     title: str
     desc: str
-    rating: float
+    rating: int = Field(..., gt=0, le=5)
     rooms: List[str]
-    cheapestPrice: float
+    cheapestPrice: int
     featured: bool

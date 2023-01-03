@@ -10,4 +10,4 @@ connection_string = f"mongodb+srv://joaoduarte:{password}@cluster0.fkigflz.mongo
 client = MongoClient(connection_string)
 print('Connected to MongoDB')
 
-Hotels = client.hotels
+hotels_collection = client.booking.hotels
