@@ -27,6 +27,5 @@ async def update_hotel(id: str, hotels: Hotels):
         update_hotel = hotels_collection.find_one_and_update(
             {'_id': ObjectId(id)}, {'$set': hotels.dict(exclude=None)}
         )
-        return update_hotel
     except Exception as ex:
         raise HTTPException(status_code=404, detail=str(ex))
