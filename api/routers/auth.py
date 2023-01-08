@@ -1,18 +1,39 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from db.database import user_collection
 from db.schemas import User, UserDisplay, LoginUser
+from pydantic import BaseModel
+from datetime import timedelta
 from auth.oauth2 import oauth2_schema
+from auth.oauth2 import create_access_token
 from utils import hash_password, verify_password
 from fastapi.responses import JSONResponse
-
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 
 router = APIRouter(
-    prefix='/auth',
     tags = ['auth']
 )
 
-@router.post('/register', status_code=status.HTTP_201_CREATED, response_model=UserDisplay)
+
+@router.post('/token')
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    
+    user = user_collection.find_one({'username': form_data.username})
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail='User or password incorrect'
+        )
+
+    if not verify_password(form_data.password,user['password']):
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Incorrect password')
+    access_token_expires = timedelta(minutes=30)
+    access_token = create_access_token(
+        data={"sub": user['username']}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post('/register', status_code=status.HTTP_201_CREATED)
 async def create_user(user: User):
     
     try:
@@ -25,14 +46,15 @@ async def create_user(user: User):
         )
         return {
             "status": "success",
-            "user": user.username
+            "user": user.username,
+            "email": user.email
         }
 
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 
 @router.post('/login')
-async def login_user(user_login: LoginUser):
+async def login_user(user_login: LoginUser, token: str = Depends(oauth2_schema)):
     try:
         user = user_collection.find_one(
             {
