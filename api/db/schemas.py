@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, constr
 from typing import List, Optional
 
 class Hotel(BaseModel):
@@ -28,3 +28,19 @@ class UpdateHotel(BaseModel):
     rooms: Optional[List[str]]=None
     cheapestPrice: Optional[int]=None
     featured: Optional[bool]=None
+
+
+class User(BaseModel):
+    username: str
+    email: str
+    password: str
+    is_admin: Optional[bool]
+
+
+class UserDisplay(BaseModel):
+    username: str
+    email: str
+
+class LoginUser(BaseModel):
+    username: str
+    password: constr(max_length=8)

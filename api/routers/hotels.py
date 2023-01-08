@@ -3,6 +3,8 @@ from db.database import hotels_collection
 from db.schemas import Hotel, UpdateHotel
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
+from auth.oauth2 import oauth2_schema
+
 router = APIRouter(
     prefix='/hotels',
     tags = ['hotels']
@@ -66,7 +68,7 @@ async def get_hotels():
         data = hotels_collection.find()
         for hotel in data:
             hotels.update(hotel)
-        
+
         del hotels['_id']
         return hotels
     except Exception as ex:

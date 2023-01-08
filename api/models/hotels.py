@@ -1,7 +1,6 @@
-from database import client
+from db import get_db
 
-
-def creating_collection_and_schema_validator():
+def creating_user_collection_and_schema_validator():
     
     hotels_validator = {
         "$jsonSchema": {
@@ -57,8 +56,8 @@ def creating_collection_and_schema_validator():
         }
     }
 
-    db = client.booking
+    db = get_db.booking
     result = db.create_collection('hotels', validator=hotels_validator )
     return print('Collection created')
 
-creating_collection_and_schema_validator()
+creating_user_collection_and_schema_validator()
