@@ -3,7 +3,7 @@ from db.database import user_collection
 from db.schemas import User, UserDisplay, LoginUser
 from pydantic import BaseModel
 from datetime import timedelta
-from auth.oauth2 import oauth2_schema
+from auth.oauth2 import oauth2_schema, get_current_user
 from auth.oauth2 import create_access_token
 from utils import hash_password, verify_password
 from fastapi.responses import JSONResponse
@@ -54,7 +54,7 @@ async def create_user(user: User):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 
 @router.post('/login')
-async def login_user(user_login: LoginUser, token: str = Depends(oauth2_schema)):
+async def login_user(user_login: LoginUser, current_user: str = Depends(get_current_user)):
     try:
         user = user_collection.find_one(
             {

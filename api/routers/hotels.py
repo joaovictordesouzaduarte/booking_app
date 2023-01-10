@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, status
+from json import JSONEncoder, dumps
 from db.database import hotels_collection
 from db.schemas import Hotel, UpdateHotel
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
-from auth.oauth2 import oauth2_schema
+from auth.oauth2 import oauth2_schema, get_current_user
 
 router = APIRouter(
     prefix='/hotels',
@@ -11,7 +12,7 @@ router = APIRouter(
 )
 
 @router.post('/')
-async def create_hotel(hotels: Hotel):
+async def create_hotel(hotels: Hotel, current_user: str = Depends(get_current_user)):
     
     try:
         hotels_collection.insert_one(hotels.dict())
@@ -19,7 +20,7 @@ async def create_hotel(hotels: Hotel):
         raise HTTPException(status_code=404, detail=str(ex))
 
 @router.put('/{id}')
-async def update_hotel(id: str, hotel:UpdateHotel):
+async def update_hotel(id: str, hotel:UpdateHotel, current_user: str = Depends(get_current_user)):
     
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -35,7 +36,7 @@ async def update_hotel(id: str, hotel:UpdateHotel):
         raise HTTPException(status_code=404, detail=str(ex))
 
 @router.delete('/{id}')
-async def delete_hotel(id: str):
+async def delete_hotel(id: str, current_user: str = Depends(get_current_user)):
     
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -47,21 +48,26 @@ async def delete_hotel(id: str):
         raise HTTPException(status_code=404, detail=str(ex))
 
 @router.get('/{id}')
-async def get_hotel_by_id(id: str):
-    
+async def get_hotel_by_id(id: str, current_user: str = Depends(get_current_user)):
+
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Invalid id {id}")
     hotel = None
+
     try:
         hotel = hotels_collection.find_one({'_id': ObjectId(id)})
-        del hotel['_id']
-        return hotel
+        
+        if hotel is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Hotel with id {id} not found')
     except Exception as ex:
         raise HTTPException(status_code=404, detail=str(ex))
 
+    del hotel['_id']
+    return hotel
+
 @router.get('/')
-async def get_hotels():
+async def get_hotels(current_user: str = Depends(get_current_user)):
 
     hotels = {}
     try:
@@ -70,6 +76,8 @@ async def get_hotels():
             hotels.update(hotel)
 
         del hotels['_id']
-        return hotels
     except Exception as ex:
         raise HTTPException(status_code=404, detail=str(ex))
+
+
+    return hotels
