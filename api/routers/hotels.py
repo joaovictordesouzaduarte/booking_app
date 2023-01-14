@@ -11,7 +11,7 @@ router = APIRouter(
     tags = ['hotels']
 )
 
-@router.post('/')
+@router.post('/create')
 async def create_hotel(hotels: Hotel, current_user: str = Depends(get_current_user)):
     
     try:
@@ -19,23 +19,24 @@ async def create_hotel(hotels: Hotel, current_user: str = Depends(get_current_us
     except Exception as ex:
         raise HTTPException(status_code=404, detail=str(ex))
 
-@router.put('/{id}')
+@router.put('/update/{id}')
 async def update_hotel(id: str, hotel:UpdateHotel, current_user: str = Depends(get_current_user)):
     
     if not ObjectId.is_valid(id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"Invalid id {id}")
 
+    
     try:
         hotels = hotels_collection.find_one_and_update(
             {'_id': ObjectId(id)}, {'$set': hotel.dict(exclude_none = True)}, return_document=ReturnDocument.AFTER
         )
         del hotels['_id']
-        return hotels
     except Exception as ex:
         raise HTTPException(status_code=404, detail=str(ex))
-
-@router.delete('/{id}')
+    
+    return hotels
+@router.delete('/delete/{id}')
 async def delete_hotel(id: str, current_user: str = Depends(get_current_user)):
     
     if not ObjectId.is_valid(id):
@@ -47,6 +48,19 @@ async def delete_hotel(id: str, current_user: str = Depends(get_current_user)):
     except Exception as ex:
         raise HTTPException(status_code=404, detail=str(ex))
 
+@router.get('/all')
+async def get_all_hotels(current_user: str = Depends(get_current_user)):
+
+    hotels = []
+    try:
+        all_hotels = hotels_collection.find()
+
+        for hotel in all_hotels:
+            del hotel['_id']
+            hotels.append(hotel)
+    except:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={f'No one hotel was found'})
+    return hotels
 @router.get('/{id}')
 async def get_hotel_by_id(id: str, current_user: str = Depends(get_current_user)):
 
@@ -66,18 +80,4 @@ async def get_hotel_by_id(id: str, current_user: str = Depends(get_current_user)
     del hotel['_id']
     return hotel
 
-@router.get('/')
-async def get_hotels(current_user: str = Depends(get_current_user)):
 
-    hotels = {}
-    try:
-        data = hotels_collection.find()
-        for hotel in data:
-            hotels.update(hotel)
-
-        del hotels['_id']
-    except Exception as ex:
-        raise HTTPException(status_code=404, detail=str(ex))
-
-
-    return hotels

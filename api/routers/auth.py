@@ -23,9 +23,8 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail='User or password incorrect'
         )
-
     if not verify_password(form_data.password,user['password']):
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Incorrect password')
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User or password incorrect')
     access_token_expires = timedelta(minutes=30)
     access_token = create_access_token(
         data={"sub": user['username']}, expires_delta=access_token_expires
@@ -41,7 +40,8 @@ async def create_user(user: User):
             {
                 'username': user.username,
                 'email': user.email,
-                'password': hash_password(user.password)
+                'password': hash_password(user.password),
+                'is_admin': user.is_admin
             }
         )
         return {

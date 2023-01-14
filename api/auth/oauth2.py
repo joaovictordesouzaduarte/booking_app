@@ -32,7 +32,6 @@ def get_current_user(token: str = Depends(oauth2_schema)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -43,4 +42,7 @@ def get_current_user(token: str = Depends(oauth2_schema)):
     user = user_collection.find_one({'username': username})
     if user is None:
         raise credentials_exception
-    return {'access_token': token, 'username': user['username'], "token_type": "bearer"}
+    return {'access_token': token, 'username': user['username'], 'email': user['email'], 'user_id': user['_id'], 'is_admin':user['is_admin'], "token_type": "bearer"}
+
+
+# def get_user_authorized(token: str = Depends(oauth2_schema), )

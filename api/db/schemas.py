@@ -34,6 +34,12 @@ class User(BaseModel):
     username: str
     email: str
     password: str
+    is_admin: Optional[bool] = False
+
+class UpdateUser(BaseModel):
+    username: Optional[str]
+    email: Optional[str]
+    password: Optional[str]
     is_admin: Optional[bool]
 
 
