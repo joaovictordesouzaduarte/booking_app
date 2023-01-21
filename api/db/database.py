@@ -17,3 +17,4 @@ except Exception:
 
 hotels_collection = client.booking.hotels
 user_collection = client.booking.user
+room_collection = client.booking.room

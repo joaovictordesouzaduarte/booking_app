@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import hotels, auth, users
+from routers import hotels, auth, users, rooms
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -7,6 +7,7 @@ app = FastAPI()
 app.include_router(hotels.router)
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(rooms.router)
 
 # @app.get("/")
 # def root():

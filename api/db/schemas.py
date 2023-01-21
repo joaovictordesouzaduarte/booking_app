@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field, constr
+from datetime import datetime
 from typing import List, Optional
 
 class Hotel(BaseModel):
@@ -50,3 +51,13 @@ class UserDisplay(BaseModel):
 class LoginUser(BaseModel):
     username: str
     password: constr(max_length=8)
+class RoomNumbers(BaseModel):
+    number: int
+    unavaliable_dates: Optional[List[datetime]]
+    
+class Room(BaseModel):
+    title: str
+    price: float
+    max_people: int
+    desc: str
+    room_numbers: List[RoomNumbers]

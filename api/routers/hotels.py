@@ -19,6 +19,8 @@ async def create_hotel(hotels: Hotel, current_user: str = Depends(get_current_us
     except Exception as ex:
         raise HTTPException(status_code=404, detail=str(ex))
 
+    return 'Ok'
+
 @router.put('/update/{id}')
 async def update_hotel(id: str, hotel:UpdateHotel, current_user: str = Depends(get_current_user)):
     
@@ -47,7 +49,6 @@ async def delete_hotel(id: str, current_user: str = Depends(get_current_user)):
         hotels_collection.find_one_and_delete({'_id': ObjectId(id)})
     except Exception as ex:
         raise HTTPException(status_code=404, detail=str(ex))
-
 @router.get('/all')
 async def get_all_hotels(current_user: str = Depends(get_current_user)):
 

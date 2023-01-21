@@ -43,8 +43,12 @@ def creating_user_collection_and_schema_validator():
                     'maximum': 5,
                     'description': 'must be a integer and required'
                 },
-                'room': {
-                    'bsonType': ['string'],
+                'rooms': {
+                'bsonType': 'array',
+                'items': {
+                    'bsonType': 'string'
+                },
+                
                 },
                 'cheapestPrice': {
                     'bsonType': 'number'
