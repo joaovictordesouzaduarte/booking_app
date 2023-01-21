@@ -51,3 +51,36 @@ async def delete_room(room_id: str, hotel_id: str, current_user = Depends(get_cu
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 
     return 'Room has been deleted'
+
+@router.get('/all')
+async def get_all_rooms(current_user = Depends(get_current_user)):
+
+    rooms = []
+    try:
+        
+        all_rooms = room_collection.find()
+        for room in all_rooms:
+            room['_id'] = str(room['_id'])
+            rooms.append(room)
+
+    except Exception as ex:
+        raise HTTPException(status_code=404, detail="Error while returning all rooms")
+    
+    return rooms
+
+@router.get('/{id}')
+async def get_room(id: str, current_user = Depends(get_current_user)):
+
+    if not ObjectId.is_valid(id):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail=f"Invalid room {id}")
+    try:
+        
+        room = room_collection.find_one(
+            {'_id': ObjectId(id)}
+        )
+        room['_id'] = str(room['_id'])
+    except Exception as ex:
+        raise HTTPException(status_code=404, detail=f"Error while returning room {id}")
+    
+    return room
