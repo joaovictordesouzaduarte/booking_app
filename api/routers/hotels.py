@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Query
 from json import JSONEncoder, dumps
 from db.database import hotels_collection
 from db.schemas import Hotel, UpdateHotel
@@ -10,7 +10,49 @@ router = APIRouter(
     prefix='/hotels',
     tags = ['hotels']
 )
+@router.get('/countbycity')
+async def get_count_by_cities(cities: str = Query(..., description='Count of cities, like: london, berlin, madrid')): 
+                            #current_user: str = Depends(get_current_user)):
+    """
+    
+        Return an array with number of hotels in each city
 
+        **Cities**: String with comma, ie: london, berlin, madrid
+    
+    """
+    
+    cities = cities.split(',')
+    try:
+        number_of_hotels = [hotels_collection.count_documents({'city': city}) for city in cities]
+    except Exception as ex:
+        raise HTTPException(status_code=404, detail=str(ex))
+
+    return number_of_hotels
+@router.get('/countbytype')
+async def get_count_by_type(types: str = Query(..., description='Hotel types, ie: villa, resort, suits')): 
+                            #current_user: str = Depends(get_current_user)):
+    """
+    
+        Return an array with number of hotels types in each city
+
+        **Type**: String with comma, ie: london, berlin, madrid
+    
+    """
+    number_of_type = []
+    types = types.split(',')
+    try:
+        for type in types:
+            
+            count_by_type = {
+                'type': type,
+                'count': hotels_collection.count_documents({'type': type})
+            }
+            number_of_type.append(count_by_type)
+
+    except Exception as ex:
+        raise HTTPException(status_code=404, detail=str(ex))
+        
+    return number_of_type
 @router.post('/create')
 async def create_hotel(hotels: Hotel, current_user: str = Depends(get_current_user)):
     
@@ -79,5 +121,7 @@ async def get_hotel_by_id(id: str, current_user: str = Depends(get_current_user)
 
     hotel['_id'] = str(hotel['_id'])
     return hotel
+
+
 
 

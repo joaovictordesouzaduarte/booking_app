@@ -54,7 +54,7 @@ async def create_user(user: User):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(ex))
 
 @router.post('/login')
-async def login_user(user_login: LoginUser, current_user: str = Depends(get_current_user)):
+async def login_user(user_login: LoginUser):
     try:
         user = user_collection.find_one(
             {
@@ -63,15 +63,15 @@ async def login_user(user_login: LoginUser, current_user: str = Depends(get_curr
         )
         if user:
             password = verify_password(user_login.password, user['password'])
-
+            user['_id'] = str(user['_id'])
             if not password:
-                return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Incorrect password')
-
-        else:
-            return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'User {user_login.username} not found!')
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='Incorrect password')
         
-        del user['_id']
-        del user['password']
-        return JSONResponse(user)
+        else:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'User {user_login.username} not found!')
+        
     except Exception as ex:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'User not found!'})
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='User not found!')
+    
+    return  JSONResponse(user)
+    
