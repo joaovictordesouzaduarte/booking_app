@@ -61,3 +61,7 @@ class Room(BaseModel):
     max_people: int
     desc: str
     room_numbers: List[RoomNumbers]
+
+
+class UpdateRoom(BaseModel):
+    unavaliable_dates: Optional[datetime]

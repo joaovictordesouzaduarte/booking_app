@@ -4,7 +4,7 @@ from db.schemas import Room
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
 from auth.oauth2 import oauth2_schema, get_current_user
-
+from db.schemas import UpdateRoom
 router = APIRouter(
     prefix='/rooms',
     tags = ['rooms']
@@ -84,3 +84,25 @@ async def get_room(id: str, current_user = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail=f"Error while returning room {id}")
     
     return room
+
+# @router.put("/update/{id}")
+# async def update_room_availability(
+#     id: str, room: UpdateRoom
+# ):
+
+#     if not ObjectId.is_valid(id):
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND, detail=f"Invalid id {id}"
+#         )
+
+#     try:
+#         rooms = room_collection.update_one(
+#             {"room_numbers._id": ObjectId(id)},
+#             {"$set": room.dict(exclude_none=True)},
+#             return_document=ReturnDocument.AFTER,
+#         )
+#         rooms["_id"] = str(rooms["_id"])
+#     except Exception as ex:
+#         raise HTTPException(status_code=404, detail=str(ex))
+
+#     return rooms

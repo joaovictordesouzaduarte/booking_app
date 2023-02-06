@@ -11,7 +11,12 @@ const useFetch = (url) => {
       setLoading(true);
 
       try {
-        const res = await axios.get(url);
+        const res = await axios.get(url, {
+          headers: {
+            accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        });
         setData(res.data);
       } catch {
         setError(true);
@@ -21,7 +26,7 @@ const useFetch = (url) => {
     fetchData();
   }, [url]);
 
-  const reFetchData = async () => {
+  const reFetch = async () => {
     setLoading(true);
 
     try {
@@ -32,6 +37,6 @@ const useFetch = (url) => {
     }
     setLoading(false);
   };
-  return { data, loading, error, reFetchData };
+  return { data, loading, error, reFetch };
 };
 export default useFetch;

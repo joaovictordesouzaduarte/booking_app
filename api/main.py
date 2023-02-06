@@ -13,7 +13,9 @@ app.include_router(rooms.router)
 # def root():
 #     return "Hello World"
 origins = [
+    'http://localhost:3000/',
     'http://localhost:3000'
+    
 ]
 app.add_middleware(
     CORSMiddleware,
