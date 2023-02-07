@@ -62,7 +62,7 @@ const Reserve = ({ setOpen, id }) => {
               <div className="rTitle">{item.title}</div>
               <div className="rDesc">{item.desc}</div>
               <div className="rMax">
-                Max people: <b>{item.maxPeople}</b>
+                Max people: <b>{item.max_people}</b>
               </div>
               <div className="rPrice">{item.price}</div>
             </div>
